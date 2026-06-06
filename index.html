@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Việt Nam Trò Chơi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --sage:#3D5C35;--sage2:#4A6741;--sage3:#5C7A52;--sl:#8BA88B;--sp:#EDF2E8;--su:#F4F7F1;
+  --cr:#F7F3EC;--cr2:#EDE8DC;--cr3:#E0D9CC;
+  --gd:#B8963E;--gd2:#D4AE58;--gd3:#EDD98A;
+  --br:#6B4F32;--br2:#4A3520;
+  --rd:#B03325;--rp:#FBEAE8;
+  --t1:#1A2B1A;--t2:#405040;--t3:#7A8E7A;--t4:#A8B8A8;
+  --wh:#FFFFFF;
+  --s1:0 1px 8px rgba(61,92,53,.10);--s2:0 4px 20px rgba(61,92,53,.16);
+}
+html,body{height:100%;overflow:hidden;background:#2A3828;font-family:'Be Vietnam Pro',sans-serif;color:var(--t1)}
+#app{width:100%;max-width:430px;height:100dvh;margin:0 auto;background:var(--cr);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(16px)}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.sb{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.sb::-webkit-scrollbar{display:none}
+.tb{background:var(--sage);padding:50px 20px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-logo{width:37px;height:37px;background:var(--gd2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.tb-title{font-family:'Playfair Display',serif;font-size:17px;color:#fff;letter-spacing:.3px}
+.tb-av{width:37px;height:37px;border-radius:50%;background:var(--gd2);color:var(--br2);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,.22);transition:transform .15s}
+.tb-av:hover{transform:scale(1.08)}
+.bn{background:var(--wh);border-top:1px solid rgba(61,92,53,.09);display:flex;padding:7px 0 calc(env(safe-area-inset-bottom,0px)+7px);flex-shrink:0}
+.nt{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 0;position:relative}
+.nt svg{width:20px;height:20px;stroke:var(--t4);fill:none;stroke-width:1.8;transition:stroke .2s}
+.nt span{font-size:9.5px;color:var(--t4);font-weight:500;transition:color .2s}
+.nt.active svg{stroke:var(--sage)}
+.nt.active span{color:var(--sage);font-weight:800}
+.nt.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:2.5px;background:var(--sage);border-radius:2px}
+.pc{background:var(--wh);margin:13px 15px 0;border-radius:16px;padding:15px;border:1px solid rgba(61,92,53,.09);box-shadow:var(--s1)}
+.pc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.pc-lbl{font-size:13px;font-weight:700}
+.pp{background:var(--sage);color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.4px}
+.bb{height:8px;background:rgba(61,92,53,.10);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.bf{height:100%;background:linear-gradient(90deg,var(--sage),var(--gd2));border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.pss{font-size:11px;color:var(--t3)}
+.sh{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--sl);padding:17px 15px 7px;text-transform:uppercase}
+.cat-tabs{display:flex;gap:8px;padding:0 15px 10px;overflow-x:auto}
+.cat-tabs::-webkit-scrollbar{display:none}
+.ctab{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;border:1.5px solid rgba(61,92,53,.15);color:var(--t3);background:var(--wh)}
+.ctab.active{background:var(--sage);color:#fff;border-color:var(--sage)}
+.gl{padding:0 15px;display:flex;flex-direction:column;gap:9px}
+.gc{background:var(--wh);border-radius:15px;border:1px solid rgba(61,92,53,.08);display:flex;align-items:center;gap:12px;padding:13px;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:var(--s1);position:relative;overflow:hidden}
+.gc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sage)}
+.gc.locked::before{background:var(--t4)}
+.gc:not(.locked):hover{transform:translateY(-2px);box-shadow:var(--s2)}
+.gc:not(.locked):active{transform:scale(0.985)}
+.gc.locked{opacity:.6;cursor:default}
+.gi{width:52px;height:52px;border-radius:13px;background:var(--su);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.ginfo{flex:1;min-width:0}
+.gn{font-size:12.5px;font-weight:800;color:var(--t1);letter-spacing:.5px;text-transform:uppercase}
+.gm{font-size:11px;color:var(--t3);margin-top:3px}
+.diff{display:inline-block;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;margin-top:4px;letter-spacing:.3px}
+.diff.easy{background:#D4EDDA;color:#1C6B3A}
+.diff.med{background:#FFF3CD;color:#856404}
+.diff.hard{background:#F8D7DA;color:#721C24}
+.gr{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.gpts{font-size:15px;font-weight:800;color:var(--gd)}
+.gcv{color:var(--t4);font-size:16px}
+.gdone{font-size:10px;background:var(--sp);color:var(--sage);padding:2px 7px;border-radius:4px;font-weight:700}
+.pw{padding:0 15px 15px}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px}
+.psl{aspect-ratio:1;border-radius:13px;border:2px dashed rgba(61,92,53,.22);background:rgba(61,92,53,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s;overflow:hidden;position:relative}
+.psl:hover{background:rgba(61,92,53,.08);border-color:var(--sl)}
+.psl.filled{border:2px solid var(--sage);background:var(--sp)}
+.psl img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.pov2{position:absolute;inset:0;background:rgba(61,92,53,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.psl.filled:hover .pov2{opacity:1}
+.spp{font-size:22px;color:var(--sl)}
+.spl{font-size:10px;color:var(--sl);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.ub{width:100%;background:var(--sage);color:#fff;border:none;border-radius:13px;padding:14px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;box-shadow:0 3px 12px rgba(61,92,53,.22)}
+.ub:hover{background:var(--sage2)}
+.ub:active{transform:scale(.98)}
+.gs-wrap{padding:0 15px 10px}
+.gs-lbl{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.gs-sel{width:100%;padding:11px 14px;border:1.5px solid rgba(61,92,53,.18);border-radius:12px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;background:var(--wh);color:var(--t1);outline:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+.gs-sel:focus{border-color:var(--sage)}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .28s}
+.mbg.open{opacity:1;pointer-events:all}
+.ms{background:var(--cr);border-radius:24px 24px 0 0;width:100%;max-width:430px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+18px);transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);max-height:88vh;overflow-y:auto}
+.mbg.open .ms{transform:translateY(0)}
+.mh{width:36px;height:4px;background:var(--cr3);border-radius:2px;margin:12px auto 0}
+.mc{padding:20px}
+.mt{font-family:'Playfair Display',serif;font-size:19px;color:var(--t1);margin-bottom:3px}
+.mst{font-size:13px;color:var(--t3);margin-bottom:16px;line-height:1.5}
+.ait{display:flex;align-items:center;gap:10px;padding:14px;background:var(--su);border-radius:13px;border:1px solid rgba(61,92,53,.1);margin-bottom:14px}
+.d{width:8px;height:8px;border-radius:50%;background:var(--sage);animation:bl 1.2s infinite}
+.d:nth-child(2){animation-delay:.2s}.d:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,100%{opacity:.22;transform:scale(.65)}50%{opacity:1;transform:scale(1.18)}}
+.ar{padding:15px;border-radius:13px;margin-bottom:14px;border:1px solid;display:none}
+.ar.ok{background:#EFF9EF;border-color:#7EC87E}
+.ar.fail{background:var(--rp);border-color:#E8A09A}
+.ar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.abadge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.6px}
+.abadge.ok{background:#D4EDDA;color:#1C6B3A}
+.abadge.fail{background:#F8D7DA;color:#7A1C24}
+.arp{font-size:24px;font-weight:800;color:var(--gd)}
+.art{font-size:13px;color:var(--t2);line-height:1.65;white-space:pre-line}
+.mb{width:100%;padding:14px;border:none;border-radius:13px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:9px}
+.mb.pri{background:var(--gd2);color:var(--br2);box-shadow:0 3px 12px rgba(184,150,62,.28)}
+.mb.pri:hover{background:var(--gd3)}
+.mb.gho{background:transparent;color:var(--t3);border:1px solid rgba(0,0,0,.09)}
+.dh{background:var(--sage);padding:50px 20px 22px;flex-shrink:0}
+.dbtn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.13);border:none;color:#fff;padding:7px 13px;border-radius:10px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px;transition:background .2s}
+.dbtn:hover{background:rgba(255,255,255,.23)}
+.diw{width:70px;height:70px;background:rgba(255,255,255,.13);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:13px}
+.dn{font-family:'Playfair Display',serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:.4px}
+.ds{font-size:13px;color:rgba(255,255,255,.68);margin-top:4px}
+.ddiff{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.db{padding:14px}
+.dc{background:var(--wh);border-radius:15px;border:1px solid rgba(61,92,53,.08);padding:15px;margin-bottom:12px;box-shadow:var(--s1)}
+.dct{font-size:10px;font-weight:800;color:var(--sage3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:9px}
+.dcd{font-size:13.5px;color:var(--t2);line-height:1.75}
+.ci{display:flex;gap:9px;margin-bottom:9px;align-items:flex-start}
+.ci:last-child{margin-bottom:0}
+.cn{width:25px;height:25px;border-radius:50%;background:var(--sp);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--sage);flex-shrink:0;margin-top:1px}
+.ct{font-size:13px;color:var(--t2);line-height:1.58}
+.pg2{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.pb{background:var(--su);border-radius:11px;padding:12px 7px;text-align:center}
+.pbl{font-size:10px;color:var(--t3);margin-bottom:3px}
+.pbv{font-size:18px;font-weight:800;color:var(--gd)}
+.jb{width:100%;background:var(--gd2);color:var(--br2);border:none;border-radius:15px;padding:16px;font-family:'Be Vietnam Pro',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;transition:all .2s;box-shadow:0 4px 14px rgba(184,150,62,.28);letter-spacing:.3px}
+.jb:hover{background:var(--gd3);transform:translateY(-1px)}
+.jb:active{transform:scale(.98)}
+.howto{background:var(--sp);border:1px solid rgba(61,92,53,.15);border-radius:13px;padding:14px;margin-bottom:12px}
+.howto-title{font-size:10px;font-weight:800;color:var(--sage);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.howto-text{font-size:13px;color:var(--t2);line-height:1.72;white-space:pre-line}
+.lbh{background:var(--sage);padding:50px 20px 18px;text-align:center;flex-shrink:0}
+.lbt{font-family:'Playfair Display',serif;font-size:21px;color:#fff;margin-bottom:2px}
+.lbs{font-size:12px;color:rgba(255,255,255,.58)}
+.pod{background:var(--sage2);display:flex;align-items:flex-end;justify-content:center;gap:16px;padding:18px 20px 24px;flex-shrink:0;min-height:120px}
+.pi{display:flex;flex-direction:column;align-items:center;gap:5px}
+.pav{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;border:2.5px solid rgba(255,255,255,.2);color:#fff;font-size:13px}
+.p1 .pav{width:64px;height:64px;font-size:19px;background:var(--gd2);border-color:var(--gd3)}
+.p2 .pav{width:52px;height:52px;background:var(--sl)}
+.p3 .pav{width:46px;height:46px;background:#9C8070}
+.pnm{font-size:11px;color:rgba(255,255,255,.88);font-weight:600;max-width:72px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.psc{font-size:11px;font-weight:800}
+.p1 .psc{color:var(--gd3)}.p2 .psc,.p3 .psc{color:rgba(255,255,255,.75)}
+.lbrow{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:13px;margin-bottom:7px;background:var(--wh);border:1px solid rgba(61,92,53,.08);box-shadow:var(--s1);transition:transform .14s}
+.lbrow:hover{transform:translateX(3px)}
+.lbrow.me{border-color:var(--sage);background:var(--sp)}
+.lbr{font-size:12px;font-weight:800;color:var(--t4);width:20px;text-align:center}
+.lbav{width:37px;height:37px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.lbi{flex:1}
+.lbn{font-size:13px;font-weight:600;color:var(--t1)}
+.lbg{font-size:11px;color:var(--t3)}
+.lbye{font-size:10px;background:rgba(61,92,53,.13);color:var(--sage);padding:2px 6px;border-radius:4px;font-weight:800;margin-left:5px}
+.lbsc{font-size:14px;font-weight:800;color:var(--gd)}
+.lb-msg{text-align:center;padding:32px 20px;color:var(--t3);font-size:13px;line-height:1.6}
+.prh{background:var(--sage);padding:50px 20px 24px;flex-shrink:0}
+.prawrap{display:flex;align-items:center;gap:15px}
+.pra{width:68px;height:68px;border-radius:50%;background:var(--gd2);border:3px solid rgba(255,255,255,.32);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;color:var(--br2)}
+.prn{font-family:'Playfair Display',serif;font-size:19px;color:#fff}
+.prs{font-size:11px;color:rgba(255,255,255,.58);margin-top:3px}
+.prt{background:rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;display:inline-block;margin-top:7px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:13px 15px}
+.sb2{background:var(--wh);border-radius:13px;padding:15px;border:1px solid rgba(61,92,53,.08);box-shadow:var(--s1);text-align:center}
+.sv{font-size:26px;font-weight:800}
+.sl2{font-size:11px;color:var(--t3);margin-top:3px}
+.bdr{padding:0 15px 15px}
+.brow{display:flex;gap:9px;flex-wrap:wrap}
+.bc{background:var(--wh);border:1px solid rgba(61,92,53,.1);border-radius:11px;padding:11px 13px;font-size:22px;box-shadow:var(--s1);cursor:default;transition:transform .15s}
+.bc:hover{transform:scale(1.1)}
+.bc.lk{opacity:.28;filter:grayscale(1)}
+.lc{margin:0 15px 13px;border-radius:15px;overflow:hidden;box-shadow:var(--s1)}
+.lch{padding:18px;display:flex;align-items:center;gap:13px}
+.lct{font-family:'Playfair Display',serif;font-size:16px;color:#fff}
+.lcsu{font-size:12px;color:rgba(255,255,255,.68);margin-top:2px}
+.lcb{background:var(--wh);padding:13px 15px;font-size:13px;color:var(--t2);line-height:1.78}
+.ob{position:fixed;inset:0;background:linear-gradient(160deg,#2A3C28 0%,var(--sage) 60%,#4A6741 100%);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 26px;text-align:center;overflow-y:auto}
+.obl{font-size:58px;margin-bottom:16px}
+.obt{font-family:'Playfair Display',serif;font-size:26px;color:#fff;margin-bottom:7px}
+.obs{font-size:13px;color:rgba(255,255,255,.7);line-height:1.68;margin-bottom:28px;max-width:290px}
+.oflbl{font-size:11px;font-weight:700;color:rgba(255,255,255,.62);letter-spacing:.8px;text-transform:uppercase;text-align:left;width:100%;margin-bottom:4px}
+.of{width:100%;padding:12px 15px;border:1.5px solid rgba(255,255,255,.18);border-radius:12px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;background:rgba(255,255,255,.11);color:#fff;outline:none;margin-bottom:12px;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.of::placeholder{color:rgba(255,255,255,.38)}
+.of:focus{border-color:rgba(255,255,255,.48);background:rgba(255,255,255,.17)}
+.of option{color:var(--t1);background:#fff}
+.obb{width:100%;padding:15px;border:none;border-radius:13px;background:var(--gd2);color:var(--br2);font-family:'Be Vietnam Pro',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(0,0,0,.22);margin-top:3px}
+.obb:hover{background:var(--gd3);transform:translateY(-1px)}
+.obb:active{transform:scale(.98)}
+#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--t1);color:#fff;padding:11px 20px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:all .27s;pointer-events:none;z-index:500;white-space:nowrap;max-width:90vw;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.22)}
+.cf{position:fixed;pointer-events:none;z-index:600;animation:cff 1.6s ease-in forwards;border-radius:2px}
+@keyframes cff{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(820deg);opacity:0}}
+@keyframes fup{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+.gc{animation:fup .35s ease both}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ONBOARDING -->
+<div class="ob" id="onboard">
+  <div class="obl">🏮</div>
+  <div class="obt">Việt Nam Trò Chơi</div>
+  <div class="obs">Khám phá và bảo tồn văn hoá Việt Nam qua những trò chơi dân gian. Cạnh tranh thật sự trên bảng xếp hạng toàn quốc.</div>
+  <div class="oflbl">Tên của bạn</div>
+  <input class="of" id="nameIn" type="text" placeholder="Nguyễn Văn An..." maxlength="25">
+  <div class="oflbl">Bạn đến từ đâu?</div>
+  <select class="of" id="cityIn">
+    <option value="">-- Chọn tỉnh thành --</option>
+    <option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option>
+    <option>Hải Phòng</option><option>Cần Thơ</option><option>Huế</option>
+    <option>Nha Trang</option><option>Đà Lạt</option><option>Vũng Tàu</option>
+    <option>Quảng Ninh</option><option>Bắc Ninh</option><option>Thái Nguyên</option>
+    <option>Nam Định</option><option>Thanh Hoá</option><option>Nghệ An</option>
+    <option>Hà Tĩnh</option><option>Quảng Bình</option><option>Quảng Trị</option>
+    <option>Quảng Nam</option><option>Quảng Ngãi</option><option>Bình Định</option>
+    <option>Phú Yên</option><option>Khánh Hoà</option><option>Ninh Thuận</option>
+    <option>Bình Thuận</option><option>Kon Tum</option><option>Gia Lai</option>
+    <option>Đắk Lắk</option><option>Đắk Nông</option><option>Lâm Đồng</option>
+    <option>Bình Phước</option><option>Tây Ninh</option><option>Bình Dương</option>
+    <option>Đồng Nai</option><option>Long An</option><option>Tiền Giang</option>
+    <option>Bến Tre</option><option>Trà Vinh</option><option>Vĩnh Long</option>
+    <option>Đồng Tháp</option><option>An Giang</option><option>Kiên Giang</option>
+    <option>Hậu Giang</option><option>Sóc Trăng</option><option>Bạc Liêu</option>
+    <option>Cà Mau</option><option>Hà Giang</option><option>Cao Bằng</option>
+    <option>Bắc Kạn</option><option>Tuyên Quang</option><option>Lào Cai</option>
+    <option>Điện Biên</option><option>Lai Châu</option><option>Sơn La</option>
+    <option>Yên Bái</option><option>Hoà Bình</option><option>Phú Thọ</option>
+    <option>Vĩnh Phúc</option><option>Hà Nam</option><option>Ninh Bình</option>
+    <option>Thái Bình</option><option>Hưng Yên</option><option>Hải Dương</option>
+    <option>Bắc Giang</option><option>Lạng Sơn</option>
+  </select>
+  <button class="obb" onclick="startApp()">🌸 Bắt Đầu Hành Trình</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainapp" style="display:none;flex:1;flex-direction:column;height:100dvh">
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="tb"><div class="tb-brand"><div class="tb-logo">🏮</div><div class="tb-title">Việt Nam Trò Chơi</div></div><div class="tb-av" id="hav" onclick="goTo('profile')">?</div></div>
+  <div class="sb">
+    <div class="pc">
+      <div class="pc-top"><span class="pc-lbl">Tiến Trình Văn Hóa</span><div class="pp">🪷 <span id="hpts">0</span> ĐIỂM</div></div>
+      <div class="bb"><div class="bf" id="hbar" style="width:0%"></div></div>
+      <div class="pss" id="hsub">0 / 12 trò chơi đã tham gia</div>
+    </div>
+    <div class="sh">Danh Sách Trò Chơi</div>
+    <div class="cat-tabs">
+      <div class="ctab active" onclick="filterCat('all',this)">Tất Cả</div>
+      <div class="ctab" onclick="filterCat('easy',this)">🟢 Dễ</div>
+      <div class="ctab" onclick="filterCat('med',this)">🟡 Trung Bình</div>
+      <div class="ctab" onclick="filterCat('hard',this)">🔴 Thử Thách</div>
+    </div>
+    <div class="gl" id="gamelist"></div>
+    <div class="sh">Gửi Ảnh Nhận Điểm</div>
+    <div class="gs-wrap">
+      <div class="gs-lbl">Bạn đang gửi ảnh trò chơi nào?</div>
+      <select class="gs-sel" id="gamesel"><option value="">-- Chọn trò chơi --</option></select>
+    </div>
+    <div class="pw">
+      <div class="pg" id="pgrid">
+        <div class="psl" id="ps0" onclick="pickPhoto(0)"><div class="spp">+</div><div class="spl">Ảnh 1</div></div>
+        <div class="psl" id="ps1" onclick="pickPhoto(1)"><div class="spp">+</div><div class="spl">Ảnh 2</div></div>
+        <div class="psl" id="ps2" onclick="pickPhoto(2)"><div class="spp">+</div><div class="spl">Ảnh 3</div></div>
+      </div>
+      <button class="ub" onclick="submitPhotos()">🌸 Gửi Ảnh Để AI Xét Duyệt</button>
+    </div>
+    <div style="height:14px"></div>
+  </div>
+  <div class="bn">
+    <div class="nt active" onclick="goTo('home')"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg><span>Khám Phá</span></div>
+    <div class="nt" onclick="goTo('library')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Thư Viện</span></div>
+    <div class="nt" onclick="goTo('leaderboard')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg><span>Xếp Hạng</span></div>
+    <div class="nt" onclick="goTo('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Cá Nhân</span></div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="screen" id="screen-leaderboard">
+  <div class="lbh"><div class="lbt">Bảng Xếp Hạng</div><div class="lbs" id="lb-updated">Người thật · Điểm thật · Supabase Live</div></div>
+  <div class="pod" id="podium"><div class="lb-msg">Đang tải...</div></div>
+  <div class="sb"><div style="padding:11px 15px" id="lblist"><div class="lb-msg">Đang kết nối...</div></div></div>
+  <div class="bn">
+    <div class="nt" onclick="goTo('home')"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg><span>Khám Phá</span></div>
+    <div class="nt" onclick="goTo('library')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Thư Viện</span></div>
+    <div class="nt active"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg><span>Xếp Hạng</span></div>
+    <div class="nt" onclick="goTo('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Cá Nhân</span></div>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div class="screen" id="screen-library">
+  <div class="tb"><div class="tb-brand"><div class="tb-logo">📖</div><div class="tb-title">Thư Viện Văn Hoá</div></div></div>
+  <div class="sb" style="padding-top:13px" id="libcontent"></div>
+  <div class="bn">
+    <div class="nt" onclick="goTo('home')"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg><span>Khám Phá</span></div>
+    <div class="nt active"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Thư Viện</span></div>
+    <div class="nt" onclick="goTo('leaderboard')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg><span>Xếp Hạng</span></div>
+    <div class="nt" onclick="goTo('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Cá Nhân</span></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="screen-profile">
+  <div class="prh">
+    <div class="prawrap">
+      <div class="pra" id="prav">?</div>
+      <div><div class="prn" id="prnm">Player</div><div class="prs" id="prsi">Việt Nam</div><div class="prt" id="prtier">🌱 Người Mới</div></div>
+    </div>
+  </div>
+  <div class="sb">
+    <div class="sg">
+      <div class="sb2"><div class="sv" id="sppts" style="color:var(--gd)">0</div><div class="sl2">Tổng Điểm</div></div>
+      <div class="sb2"><div class="sv" id="spgm" style="color:var(--sage)">0</div><div class="sl2">Trò Chơi</div></div>
+      <div class="sb2"><div class="sv" id="sprk" style="color:var(--br)">#–</div><div class="sl2">Hạng Thật</div></div>
+      <div class="sb2"><div class="sv" id="spph" style="color:var(--rd)">0</div><div class="sl2">Ảnh Chia Sẻ</div></div>
+    </div>
+    <div class="sh">Huy Hiệu</div>
+    <div class="bdr"><div class="brow" id="bdgrow"></div></div>
+    <div style="height:14px"></div>
+  </div>
+  <div class="bn">
+    <div class="nt" onclick="goTo('home')"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg><span>Khám Phá</span></div>
+    <div class="nt" onclick="goTo('library')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Thư Viện</span></div>
+    <div class="nt" onclick="goTo('leaderboard')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg><span>Xếp Hạng</span></div>
+    <div class="nt active"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Cá Nhân</span></div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="screen" id="screen-detail">
+  <div class="dh">
+    <button class="dbtn" onclick="goTo('home')">← Quay Lại</button>
+    <div class="diw" id="dicon">🪨</div>
+    <div class="dn" id="dname">Trò Chơi</div>
+    <div class="ds" id="dsub"></div>
+    <div class="ddiff" id="ddiff"></div>
+  </div>
+  <div class="sb">
+    <div class="db">
+      <div class="howto" id="dhowto" style="display:none"><div class="howto-title">📖 Cách Chơi Ngay</div><div class="howto-text" id="dhowtotext"></div></div>
+      <div class="dc"><div class="dct">Về Trò Chơi</div><div class="dcd" id="ddesc"></div></div>
+      <div class="dc"><div class="dct">Thử Thách Để Nhận Điểm</div><div id="dchal"></div></div>
+      <div class="dc"><div class="dct">Điểm Thưởng</div><div class="pg2"><div class="pb"><div class="pbl">Hoàn thành</div><div class="pbv" id="dp1">+0</div></div><div class="pb"><div class="pbl">Mỗi ảnh</div><div class="pbv">+50</div></div><div class="pb"><div class="pbl">Bonus AI</div><div class="pbv">+20~80</div></div></div></div>
+      <button class="jb" id="jbtn" onclick="joinFromDetail()">🌟 Chọn Trò Này & Gửi Ảnh</button>
+      <div style="height:14px"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /mainapp -->
+
+<!-- MODAL -->
+<div class="mbg" id="modal">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mc">
+      <div class="mt" id="mtitle">AI đang xét duyệt...</div>
+      <div class="mst" id="msub">Hệ thống đang kiểm tra ảnh của bạn</div>
+      <div class="ait" id="ait"><div class="d"></div><div class="d"></div><div class="d"></div><span style="font-size:13px;color:var(--t2);margin-left:6px">Đang phân tích ảnh thực tế...</span></div>
+      <div class="ar" id="ares">
+        <div class="ar-top"><div class="abadge" id="abadge">KẾT QUẢ</div><div class="arp" id="apts"></div></div>
+        <div class="art" id="atxt"></div>
+      </div>
+      <button class="mb pri" id="mok" style="display:none" onclick="confirmPoints()">✓ Nhận Điểm!</button>
+      <button class="mb gho" onclick="closeModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<input type="file" id="finput" accept="image/*">
+
+<script>
+// ══════════════════════════════════════════════════
+// SUPABASE CONFIG
+// ══════════════════════════════════════════════════
+const SB_URL = 'https://pudsnbizkihwxpeyasis.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1ZHNuYml6a2lod3hwZXlhc2lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDE3ODcsImV4cCI6MjA5NjMxNzc4N30.KR8b3qSbRyXxRce9x8UUBK0oGd7bje7qZ0BT4xmKu6A';
+
+const SB = {
+  headers: {
+    'Content-Type': 'application/json',
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Prefer': 'return=minimal'
+  },
+  async upsert(row) {
+    try {
+      const res = await fetch(SB_URL + '/rest/v1/leaderboard', {
+        method: 'POST',
+        headers: { ...this.headers, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(row)
+      });
+      return res.ok;
+    } catch(e) { return false; }
+  },
+  async fetchAll() {
+    try {
+      const res = await fetch(SB_URL + '/rest/v1/leaderboard?select=*&order=points.desc', {
+        headers: this.headers
+      });
+      if (!res.ok) return [];
+      return await res.json();
+    } catch(e) { return []; }
+  }
+};
+
+// ══════════════════════════════════════════════════
+// GAME DATA
+// ══════════════════════════════════════════════════
+const GAMES = {
+  banhDua:{name:'Banh Đũa',icon:'🥢',sub:'2–4 người · Đũa & bóng nhỏ',pts:180,diff:'easy',color:'#8B4513',
+    desc:'Banh Đũa là trò chơi dân gian cực phổ biến, chỉ cần một đôi đũa và quả bóng nhỏ. Người chơi dùng đũa tung, đập và đỡ bóng, cố gắng giữ bóng không rơi xuống đất lâu nhất.',
+    howto:'1. Chuẩn bị 1 đôi đũa + 1 quả bóng nhỏ (bóng tennis mini, bóng giấy cuộn, nắp chai).\n2. Tung bóng lên và dùng đũa đập/giữ bóng không rơi xuống đất.\n3. Chơi 1 mình (đếm số lần) hoặc 2 người truyền bóng cho nhau.\n4. Ai đập bóng được nhiều lần liên tiếp nhất thắng!',
+    challenges:['Chụp ảnh đang cầm đũa và có bóng nhỏ rõ ràng trong tay hoặc trên không','Ảnh phải thấy rõ đôi đũa và người đang chơi','Nụ cười và không khí vui vẻ là điểm cộng!'],
+    lib:'Banh Đũa là trò chơi xuất hiện lâu đời tại Việt Nam, chỉ cần đôi đũa bình thường là có thể chơi ngay. Rèn luyện sự khéo léo, phản xạ nhanh và khả năng phối hợp tay-mắt.'},
+  oAnQuan:{name:'Ô Ăn Quan',icon:'🪨',sub:'2 người · Chiến lược với sỏi',pts:260,diff:'easy',color:'#3D5C35',
+    desc:'Ô Ăn Quan là trò chơi chiến lược cổ đại từ thế kỷ 16. Bàn chơi gồm 10 ô nhỏ và 2 ô quan lớn. Người chơi phân phối sỏi để thu thập nhiều đá nhất về phía mình.',
+    howto:'1. Vẽ bàn chơi: 2 hàng 5 ô nhỏ, 1 ô quan lớn ở mỗi đầu.\n2. Đặt 5 viên sỏi vào mỗi ô nhỏ.\n3. Lượt đến, lấy hết sỏi 1 ô và rải lần lượt sang các ô kế tiếp.\n4. Nếu ô sau ô cuối cùng có sỏi → tiếp tục; ô trống → thu sỏi ô kế. Ai nhiều sỏi hơn thắng!',
+    challenges:['Chụp ảnh 2 người đang ngồi chơi Ô Ăn Quan với bàn sỏi/ô vẽ rõ ràng','Ảnh phải thấy rõ sỏi/đá và bàn chơi','Khuôn mặt người chơi tập trung suy nghĩ là điểm cộng!'],
+    lib:'Ô Ăn Quan phản ánh trí tuệ toán học và sự kiên nhẫn của người Việt. Chỉ cần sỏi nhặt ngoài đường và vẽ ô trên đất là có thể chơi. Rèn luyện tư duy logic và khả năng đọc vị đối thủ.'},
+  nhayLonCon:{name:'Nhảy Lò Cò',icon:'🦘',sub:'2+ người · Vận động đơn giản',pts:160,diff:'easy',color:'#2D6B8B',
+    desc:'Nhảy Lò Cò là trò chơi vận động cực kỳ đơn giản — co một chân và nhảy qua các ô vẽ trên đất. Người chơi thi nhau hoàn thành đường ô nhanh nhất mà không mất thăng bằng.',
+    howto:'1. Vẽ dãy ô vuông trên đất/sàn (8–10 ô dạng zigzag hoặc thẳng).\n2. Co 1 chân, nhảy lò cò qua từng ô không dẫm vào đường kẻ.\n3. Đến cuối quay lại, ai hoàn thành nhanh và không phạm lỗi thắng!\n4. Biến thể: ném đá vào ô trước rồi nhảy tránh ô đó.',
+    challenges:['Chụp ảnh đang nhảy lò cò trên các ô vẽ trên đất/sàn','Ảnh phải thấy rõ các ô vẽ và người đang co chân nhảy','Chụp cả nhóm cùng chơi càng vui!'],
+    lib:'Nhảy Lò Cò gắn với ký ức tuổi thơ của hầu hết người Việt. Chỉ cần một viên phấn hoặc que vẽ lên đất là đủ để chơi. Phát triển thể lực, thăng bằng và tinh thần cạnh tranh lành mạnh.'},
+  bitmay:{name:'Bịt Mắt Bắt Dê',icon:'🙈',sub:'4+ người · Vui nhộn theo nhóm',pts:200,diff:'easy',color:'#6B3D8B',
+    desc:'Bịt Mắt Bắt Dê là trò chơi tập thể vui nhộn. Một người bị bịt mắt và phải tìm bắt những người còn lại đang di chuyển và tránh né. Người bị bắt sẽ thay vào vị trí bị bịt mắt.',
+    howto:'1. Chọn 1 người "bắt dê" — bịt mắt bằng khăn.\n2. Những người còn lại đứng thành vòng tròn, vỗ tay để người bịt mắt định hướng.\n3. Người bịt mắt di chuyển và cố gắng chạm vào người khác.\n4. Ai bị chạm sẽ thành người bịt mắt tiếp theo!',
+    challenges:['Chụp ảnh nhóm đang chơi với ít nhất 1 người đang bịt mắt bằng khăn','Ảnh phải thấy rõ người bịt mắt và ít nhất 3 người xung quanh','Thể hiện không khí vui vẻ của nhóm chơi'],
+    lib:'Bịt Mắt Bắt Dê là trò chơi dân gian có mặt khắp nơi nhưng phiên bản Việt Nam có tiếng vỗ tay dẫn đường đặc trưng. Phát triển kỹ năng lắng nghe, định hướng và phản xạ.'},
+  cocCocCoc:{name:'Cốc Cốc Cốc',icon:'🪘',sub:'2 người · Nhịp điệu & phản xạ',pts:200,diff:'easy',color:'#6B4F32',
+    desc:'Cốc Cốc Cốc là trò chơi đồng dao kết hợp nhịp điệu và phản xạ nhanh. Người chơi gõ tay theo nhịp xen kẽ câu hỏi-trả lời, mô phỏng tiếng gõ cửa trong văn hoá truyền thống.',
+    howto:'1. 2 người ngồi đối mặt, đặt tay lên bàn hoặc gõ vào tay nhau.\n2. Gõ nhịp luân phiên theo đồng dao: "Cốc cốc cốc / Ai gọi đó / Tôi là thỏ..."\n3. Vừa gõ vừa hát, người nào lỡ nhịp hoặc hát sai thua!\n4. Tăng tốc độ dần để thêm phần thử thách.',
+    challenges:['Chụp ảnh 2 người đang gõ tay theo nhịp hoặc chơi Cốc Cốc Cốc','Tay của người chơi phải đang tiếp xúc nhau hoặc đang gõ nhịp','Ảnh rõ nét, thể hiện hoạt động đang diễn ra vui vẻ'],
+    lib:'Cốc Cốc Cốc gắn với những bài đồng dao trẻ em, là cầu nối yêu thương giữa các thế hệ. Giúp trẻ phát triển phản xạ, nhịp điệu và khả năng phối hợp.'},
+  trondanh:{name:'Trốn Tìm',icon:'👀',sub:'3+ người · Vui nhộn mọi nơi',pts:170,diff:'easy',color:'#1E5C4A',
+    desc:'Trốn Tìm là trò chơi kinh điển mà thế hệ nào cũng biết. Một người đếm đến 20, những người còn lại chạy trốn. Người đếm đi tìm, ai bị tìm thấy trước sẽ là người đếm tiếp.',
+    howto:'1. Chọn 1 người "tìm" — đứng quay mặt vào tường đếm to đến 20.\n2. Mọi người chạy trốn vào các góc khuất.\n3. Sau khi đếm xong, hô "Tôi đi tìm!" và bắt đầu.\n4. Khi thấy ai, hô to tên và vỗ vào tường (base) để "bắt". Ai không bị tìm thấy thắng!',
+    challenges:['Chụp ảnh nhóm đang chơi trốn tìm (1 người đang đếm, người khác đang trốn)','Ảnh phải thể hiện rõ hoạt động đang diễn ra, có ít nhất 3 người','Chụp cảnh đang trốn hoặc đang được phát hiện đều được!'],
+    lib:'Trốn Tìm xuất hiện từ hàng nghìn năm ở Việt Nam. Giúp trẻ em phát triển tư duy không gian, sự kiên nhẫn và kỹ năng quan sát.'},
+  nhayDay:{name:'Nhảy Dây',icon:'🪢',sub:'3+ người · Vận động vui nhộn',pts:220,diff:'easy',color:'#4A2D7A',
+    desc:'Nhảy dây tập thể là trò chơi dân gian phổ biến khắp Việt Nam. Hai người cầm dây quay, người còn lại nhảy theo nhịp — rèn sức bền, phối hợp và tinh thần vui vẻ.',
+    howto:'1. 2 người cầm 2 đầu dây, quay đều.\n2. Người nhảy chờ đúng nhịp rồi bước vào giữa, nhảy theo nhịp dây.\n3. Kết hợp đồng dao: "Con chim non, đậu trên cành..." theo nhịp nhảy.\n4. Ai để dây quét chân phải đổi vị trí quay dây!',
+    challenges:['Chụp ảnh nhóm đang chơi nhảy dây với ít nhất 3 người','Ảnh phải thấy rõ dây và người đang nhảy hoặc chuẩn bị nhảy','Ảnh thể hiện sự vui vẻ, năng động của nhóm'],
+    lib:'Nhảy dây gắn liền với ký ức tuổi thơ hàng triệu người Việt. Ở miền Bắc thường kết hợp đồng dao vui nhộn. Rèn luyện sức bền tim mạch, nhịp điệu và tinh thần tập thể.'},
+  keoCo:{name:'Kéo Co',icon:'💪',sub:'6+ người · Sức mạnh đoàn kết',pts:320,diff:'med',color:'#8B2000',
+    desc:'Kéo co là môn thể thao dân gian được UNESCO công nhận. Hai đội kéo hai đầu sợi dây thừng, đội nào kéo đội kia qua vạch giữa thắng.',
+    howto:'1. Cần 1 sợi dây thừng dài (hoặc áo/quần buộc lại).\n2. Chia đều 2 đội, vẽ vạch giữa.\n3. Khi có hiệu lệnh, 2 đội kéo mạnh về phía mình.\n4. Đội nào kéo đội kia qua vạch giữa thắng! Chơi best 3 ván.',
+    challenges:['Chụp ảnh 2 đội đang kéo dây với ít nhất 6 người chia đều 2 bên','Ảnh phải thấy rõ sợi dây và 2 đội đang căng sức kéo','Thể hiện tinh thần chiến đấu và đoàn kết của các đội'],
+    lib:'Kéo Co được UNESCO công nhận là Di sản Văn hoá Phi vật thể. Tại Việt Nam gắn liền với các lễ hội nông nghiệp, cầu mưa thuận gió hoà.'},
+  rongRan:{name:'Rồng Rắn Lên Mây',icon:'🐍',sub:'6–10 người · Đội nhóm lớn',pts:380,diff:'med',color:'#3D6B5E',
+    desc:'Rồng Rắn Lên Mây mô phỏng rồng bay lên mây — biểu tượng may mắn. Người đầu hàng và người đứng tách ra đối đáp đồng dao, sau đó cuộc đuổi bắt bắt đầu.',
+    howto:'1. Chọn 1 người làm "thầy thuốc" đứng riêng.\n2. Còn lại xếp thành hàng dài, tay đặt lên vai người trước.\n3. Người đầu hàng dẫn "rồng" đến gặp thầy thuốc, đối đáp đồng dao.\n4. Thầy thuốc cố bắt đuôi rồng — cả hàng cùng chạy lắc lư bảo vệ đuôi!',
+    challenges:['Chụp ảnh cả nhóm đứng thành hàng dài nắm vai nhau (ít nhất 6 người)','Ảnh phải thấy rõ hàng người nối tiếp nhau tạo thành "rồng"','Chụp cảnh đang chạy lắc lư càng tuyệt!'],
+    lib:'Rồng Rắn Lên Mây chứa đựng tín ngưỡng về mưa thuận gió hoà. Bài đồng dao đi kèm là di sản văn hoá dân gian quý giá của người Việt vùng đồng bằng Bắc Bộ.'},
+  dauVat:{name:'Đấu Vật Dân Gian',icon:'🤼',sub:'2 người · Sức mạnh & kỹ thuật',pts:350,diff:'med',color:'#6B2020',
+    desc:'Đấu vật là môn võ thuật dân gian có lịch sử hàng nghìn năm, tổ chức trang trọng trong các lễ hội truyền thống. Hai đấu sĩ thi sức mạnh, người nào ngã chạm đất trước thì thua.',
+    howto:'1. 2 người đứng đối mặt trên sàn phẳng (bãi cỏ, thảm).\n2. Khi có hiệu lệnh, cố gắng quật ngã đối phương.\n3. Ai có bộ phận nào ngoài bàn chân chạm đất là thua.\n4. Chơi an toàn, không tấn công vào đầu hay vùng nguy hiểm!',
+    challenges:['Chụp ảnh 2 người đang trong tư thế đấu vật (ôm nhau, giao chiến)','Ảnh phải thấy rõ cả 2 đấu sĩ đang thực sự thi đấu','Chụp trên bãi cỏ hoặc sàn an toàn'],
+    lib:'Đấu vật dân gian Việt Nam gắn với lễ hội xuân như hội Lim, hội Đền Hùng. Rèn luyện sức mạnh, kỹ thuật và tinh thần thượng võ.'},
+  danh_dao:{name:'Đánh Đáo',icon:'🪙',sub:'2–4 người · Khéo léo & chính xác',pts:240,diff:'med',color:'#1E5C5C',
+    desc:'Đánh Đáo rèn luyện sự khéo léo và chính xác. Người chơi tung hoặc ném đồng xu/hòn đá vào mục tiêu vạch trên đất. Ai ném trúng và gần đích nhất thắng và thu xu của đối thủ.',
+    howto:'1. Vẽ 1 vạch đích trên đất (hoặc dùng chai nước làm mục tiêu).\n2. Mỗi người có 3–5 đồng xu hoặc nắp chai.\n3. Đứng cách vạch 3–5 bước, tung/ném đồng xu vào đích.\n4. Ai ném gần đích nhất thắng và thu xu của người khác!',
+    challenges:['Chụp ảnh đang thực sự chơi đánh đáo với đồng xu hoặc nắp chai','Ảnh phải thấy rõ đạo cụ và vạch đích trên đất','Thể hiện sự tập trung khi đang ném/tung'],
+    lib:'Đánh Đáo rèn luyện sự khéo léo, chính xác và bình tĩnh. Phổ biến ở cả thành thị và nông thôn, thường chơi vào dịp Tết và những buổi chiều tự do.'},
+  muaRoi:{name:'Múa Rối Nước',icon:'🎭',sub:'Di sản UNESCO · Đặc biệt',pts:500,diff:'hard',color:'#4A3520',locked:true,unlockAt:600,
+    desc:'Múa Rối Nước là nghệ thuật độc đáo của đồng bằng sông Hồng, được UNESCO công nhận. Người điều khiển đứng sau mành điều khiển con rối gỗ trên mặt nước.',
+    howto:'Đây là nghệ thuật biểu diễn chuyên nghiệp. Tìm đến Nhà hát Múa Rối Thăng Long (Hà Nội) hoặc các lễ hội văn hoá để xem biểu diễn thực tế.',
+    challenges:['Chụp ảnh tại buổi biểu diễn múa rối nước thực tế','Ảnh phải thấy rõ sân khấu nước, con rối hoặc khán giả','Chia sẻ địa điểm và tên tích truyện đã xem'],
+    lib:'Múa Rối Nước sử dụng mặt nước làm sân khấu. UNESCO công nhận là Di sản Văn hoá Phi vật thể. Nghệ nhân điều khiển con rối gỗ điêu khắc tinh xảo biểu diễn tích dân gian.'},
+};
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let S={name:'',city:'',initials:'',points:0,gamesPlayed:[],photosShared:0,joinedAt:'',userId:'',pendingPhotos:[null,null,null],pendingGame:null,pendingPts:0};
+let curSlot=0,toastT=null,activeCat='all';
+
+function save(){try{const c={...S};delete c.pendingPhotos;delete c.pendingPts;localStorage.setItem('vntc5',JSON.stringify(c))}catch(e){}}
+function load(){try{const d=localStorage.getItem('vntc5');if(d){Object.assign(S,JSON.parse(d));return!!S.name}}catch(e){}return false;}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+window.onload=function(){
+  document.getElementById('finput').addEventListener('change',handleFile);
+  if(load()){showApp();}else{document.getElementById('onboard').style.display='flex';}
+};
+
+function startApp(){
+  const n=document.getElementById('nameIn').value.trim();
+  const c=document.getElementById('cityIn').value;
+  if(!n){toast('Vui lòng nhập tên!');return;}
+  if(!c){toast('Vui lòng chọn tỉnh thành!');return;}
+  const pts2=n.split(' ');
+  S.name=n;S.city=c;
+  S.initials=(pts2[0][0]+(pts2[pts2.length-1][0]||'')).toUpperCase();
+  S.joinedAt=new Date().toLocaleDateString('vi-VN');
+  S.userId=genId();
+  save();
+  document.getElementById('onboard').style.display='none';
+  showApp();
+}
+
+function showApp(){
+  document.getElementById('mainapp').style.display='flex';
+  buildGameList();buildGameSelect();buildLibrary();updateHomeUI();
+  pushScore();goTo('home');
+}
+
+// ══════════════════════════════════════════════════
+// SUPABASE LEADERBOARD
+// ══════════════════════════════════════════════════
+async function pushScore(){
+  await SB.upsert({
+    user_id: S.userId,
+    name: S.name,
+    city: S.city,
+    points: S.points,
+    games_played: S.gamesPlayed.length,
+    photos_shared: S.photosShared,
+    updated_at: new Date().toISOString()
+  });
+}
+
+async function fetchLeaderboard(){
+  const rows = await SB.fetchAll();
+  return rows.map(r=>({...r, isMe: r.user_id === S.userId}));
+}
+
+// ══════════════════════════════════════════════════
+// BUILD UI
+// ══════════════════════════════════════════════════
+function filterCat(cat,el){
+  activeCat=cat;
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  buildGameList();
+}
+
+function buildGameList(){
+  const dl={easy:'🟢 Dễ bắt đầu',med:'🟡 Trung bình',hard:'🔴 Thử thách'};
+  const dc={easy:'easy',med:'med',hard:'hard'};
+  let html='',i=0;
+  Object.entries(GAMES).forEach(([id,g])=>{
+    const locked=g.locked&&S.points<(g.unlockAt||0);
+    const done=S.gamesPlayed.includes(id);
+    if(activeCat!=='all'&&g.diff!==activeCat)return;
+    html+=`<div class="gc${locked?' locked':''}" style="animation-delay:${i*0.05}s" ${locked?'':'onclick="goToDetail(\''+id+'\')"'}>
+      <div class="gi">${g.icon}</div>
+      <div class="ginfo">
+        <div class="gn" style="${locked?'color:var(--t4)':''}">${g.name}</div>
+        <div class="gm">${locked?'🔒 Mở khoá ở '+g.unlockAt+' điểm':g.sub}</div>
+        ${!locked?'<div class="diff '+dc[g.diff]+'">'+dl[g.diff]+'</div>':''}
+      </div>
+      <div class="gr">
+        ${locked?'<div style="font-size:20px">🔒</div>':'<div class="gpts">+'+g.pts+'</div><div class="gcv">›</div>'}
+        ${done&&!locked?'<div class="gdone">✓ Đã chơi</div>':''}
+      </div>
+    </div>`;i++;
+  });
+  document.getElementById('gamelist').innerHTML=html||'<div style="text-align:center;padding:28px;color:var(--t3);font-size:13px">Không có trò chơi trong nhóm này.</div>';
+}
+
+function buildGameSelect(){
+  const sel=document.getElementById('gamesel');
+  sel.innerHTML='<option value="">-- Chọn trò chơi đã chơi --</option>';
+  Object.entries(GAMES).forEach(([id,g])=>{
+    if(g.locked&&S.points<(g.unlockAt||0))return;
+    sel.innerHTML+=`<option value="${id}">${g.icon} ${g.name}</option>`;
+  });
+}
+
+function buildLibrary(){
+  document.getElementById('libcontent').innerHTML=
+    Object.entries(GAMES).map(([id,g])=>`
+    <div class="lc">
+      <div class="lch" style="background:${g.color}">
+        <span style="font-size:32px">${g.icon}</span>
+        <div><div class="lct">${g.name}</div><div class="lcsu">${g.sub}</div></div>
+      </div>
+      <div class="lcb">${g.lib}</div>
+    </div>`).join('')+'<div style="height:14px"></div>';
+}
+
+// ══════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════
+function goTo(sc){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+sc).classList.add('active');
+  if(sc==='leaderboard')renderLB();
+  if(sc==='profile')renderProfile();
+  if(sc==='home'){buildGameList();buildGameSelect();updateHomeUI();}
+}
+
+function goToDetail(id){
+  const g=GAMES[id];if(!g)return;
+  document.getElementById('dicon').textContent=g.icon;
+  document.getElementById('dname').textContent=g.name;
+  document.getElementById('dsub').textContent=g.sub;
+  document.getElementById('dp1').textContent='+'+g.pts;
+  const dc={easy:{lbl:'🟢 Dễ Bắt Đầu',bg:'#D4EDDA',col:'#1C6B3A'},med:{lbl:'🟡 Trung Bình',bg:'#FFF3CD',col:'#856404'},hard:{lbl:'🔴 Thử Thách',bg:'#F8D7DA',col:'#721C24'}};
+  const d=dc[g.diff]||dc.easy;
+  const dd=document.getElementById('ddiff');
+  dd.textContent=d.lbl;dd.style.background=d.bg;dd.style.color=d.col;
+  document.getElementById('ddesc').textContent=g.desc;
+  document.getElementById('dchal').innerHTML=g.challenges.map((c,i)=>`<div class="ci"><div class="cn">${i+1}</div><div class="ct">${c}</div></div>`).join('');
+  const hw=document.getElementById('dhowto');
+  if(g.howto){hw.style.display='block';document.getElementById('dhowtotext').textContent=g.howto;}else{hw.style.display='none';}
+  document.getElementById('jbtn').dataset.gid=id;
+  document.getElementById('jbtn').textContent=S.gamesPlayed.includes(id)?'🔄 Chơi Lại & Gửi Ảnh':'🌟 Chọn Trò Này & Gửi Ảnh';
+  goTo('detail');
+}
+
+function joinFromDetail(){
+  const id=document.getElementById('jbtn').dataset.gid;
+  const sel=document.getElementById('gamesel');
+  for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===id){sel.selectedIndex=i;break;}}
+  toast('✅ Đã chọn '+GAMES[id].name+' — hãy chụp ảnh và gửi!');
+  goTo('home');
+  setTimeout(()=>{document.querySelector('.pw')?.scrollIntoView({behavior:'smooth',block:'start'});},300);
+}
+
+// ══════════════════════════════════════════════════
+// PHOTOS & AI
+// ══════════════════════════════════════════════════
+function pickPhoto(i){curSlot=i;document.getElementById('finput').click();}
+function handleFile(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{S.pendingPhotos[curSlot]=ev.target.result;renderSlots();};
+  r.readAsDataURL(f);e.target.value='';
+}
+function renderSlots(){
+  for(let i=0;i<3;i++){
+    const el=document.getElementById('ps'+i);
+    if(S.pendingPhotos[i]){
+      el.innerHTML=`<img src="${S.pendingPhotos[i]}" alt=""><div class="pov2" onclick="removePhoto(${i})"><span style="color:#fff;font-size:20px">✕</span></div>`;
+      el.classList.add('filled');
+    }else{
+      el.innerHTML=`<div class="spp">+</div><div class="spl">Ảnh ${i+1}</div>`;
+      el.classList.remove('filled');
+    }
+  }
+}
+function removePhoto(i){S.pendingPhotos[i]=null;renderSlots();}
+
+async function submitPhotos(){
+  const gid=document.getElementById('gamesel').value;
+  if(!gid){toast('⚠️ Hãy chọn trò chơi trước!');return;}
+  const photos=S.pendingPhotos.filter(Boolean);
+  if(!photos.length){toast('⚠️ Hãy chọn ít nhất 1 ảnh!');return;}
+  S.pendingGame=gid;
+  openModal();await aiReview(photos);
+}
+
+async function aiReview(photos){
+  document.getElementById('ait').style.display='flex';
+  document.getElementById('ares').style.display='none';
+  document.getElementById('mok').style.display='none';
+  document.getElementById('mtitle').textContent='AI đang xét duyệt...';
+  document.getElementById('msub').textContent='Vui lòng chờ — AI đang phân tích ảnh thực tế';
+
+  const g=GAMES[S.pendingGame];
+  const content=[{type:'text',text:`Bạn là AI kiểm duyệt NGHIÊM NGẶT cho ứng dụng văn hoá Việt Nam "Việt Nam Trò Chơi".
+
+Trò chơi khai báo: "${g.name}"
+Mô tả: ${g.desc}
+Yêu cầu ảnh: ${g.challenges.join(' | ')}
+
+TỪ CHỐI (approved=false) nếu:
+- Không có người đang chơi trò chơi dân gian
+- Ảnh là selfie, phong cảnh, thức ăn, vật dụng ngẫu nhiên, chụp màn hình
+- Ảnh tối/mờ không rõ hoạt động
+- Trò chơi trong ảnh KHÁC với "${g.name}"
+- Không thấy đạo cụ/hoạt động đặc trưng của trò chơi
+
+CHẤP NHẬN (approved=true) nếu:
+- Rõ ràng thể hiện người đang chơi đúng trò chơi "${g.name}"
+- Có đủ yếu tố trực quan liên quan
+- Ánh sáng đủ rõ
+
+Trả lời JSON (không markdown):
+{"approved":boolean,"bonusPoints":20_đến_80_nếu_ok_else_0,"feedback":"2-3 câu tiếng Việt cụ thể","detectedContent":"mô tả ngắn những gì AI thấy"}`}];
+
+  photos.forEach(p=>{
+    const b=p.split(',')[1],m=(p.match(/data:([^;]+);/)||[])[1]||'image/jpeg';
+    content.push({type:'image',source:{type:'base64',media_type:m,data:b}});
+  });
+
+  let result;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content}]})
+    });
+    const data=await res.json();
+    result=JSON.parse(data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim());
+  }catch(e){
+    result={approved:false,bonusPoints:0,feedback:'Lỗi kết nối AI. Kiểm tra mạng và thử lại.',detectedContent:'Lỗi'};
+  }
+
+  document.getElementById('ait').style.display='none';
+  const ar=document.getElementById('ares');ar.style.display='block';
+
+  if(result.approved){
+    const tot=g.pts+(photos.length*50)+result.bonusPoints;
+    S.pendingPts=tot;
+    ar.className='ar ok';
+    document.getElementById('abadge').className='abadge ok';
+    document.getElementById('abadge').textContent='✓ ĐƯỢC CHẤP NHẬN';
+    document.getElementById('apts').textContent='+'+tot+' điểm';
+    document.getElementById('atxt').textContent=result.feedback+(result.detectedContent?'\n\nAI nhận diện: '+result.detectedContent:'');
+    document.getElementById('mok').style.display='block';
+    document.getElementById('mtitle').textContent='🎉 Ảnh hợp lệ!';
+    document.getElementById('msub').textContent='AI đã xác nhận hoạt động trong ảnh của bạn';
+  }else{
+    S.pendingPts=0;
+    ar.className='ar fail';
+    document.getElementById('abadge').className='abadge fail';
+    document.getElementById('abadge').textContent='✗ BỊ TỪ CHỐI';
+    document.getElementById('apts').textContent='0 điểm';
+    document.getElementById('atxt').textContent=result.feedback+(result.detectedContent?'\n\nAI thấy: '+result.detectedContent:'');
+    document.getElementById('mok').style.display='none';
+    document.getElementById('mtitle').textContent='Ảnh chưa đạt yêu cầu';
+    document.getElementById('msub').textContent='Đọc hướng dẫn bên trên và chụp lại';
+  }
+}
+
+async function confirmPoints(){
+  S.points+=S.pendingPts;
+  S.photosShared+=S.pendingPhotos.filter(Boolean).length;
+  if(S.pendingGame&&!S.gamesPlayed.includes(S.pendingGame))S.gamesPlayed.push(S.pendingGame);
+  S.pendingPhotos=[null,null,null];S.pendingGame=null;
+  save();
+  await pushScore();
+  closeModal();renderSlots();updateHomeUI();buildGameList();buildGameSelect();confetti();
+  toast('🎊 +'+S.pendingPts+' điểm! Bảng xếp hạng đã cập nhật!');
+  S.pendingPts=0;
+  document.getElementById('gamesel').value='';
+}
+
+// ══════════════════════════════════════════════════
+// HOME UI
+// ══════════════════════════════════════════════════
+function updateHomeUI(){
+  document.getElementById('hav').textContent=S.initials||'?';
+  document.getElementById('hpts').textContent=S.points.toLocaleString('vi-VN');
+  document.getElementById('hbar').style.width=Math.min((S.points/3000)*100,100)+'%';
+  document.getElementById('hsub').textContent=S.gamesPlayed.length+' / 12 trò chơi đã tham gia';
+}
+
+// ══════════════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════════════
+async function renderLB(){
+  document.getElementById('podium').innerHTML='<div class="lb-msg">Đang kết nối Supabase...</div>';
+  document.getElementById('lblist').innerHTML='<div class="lb-msg">Đang tải bảng xếp hạng thật...</div>';
+
+  const entries=await fetchLeaderboard();
+
+  // make sure current user is always shown
+  if(!entries.find(e=>e.isMe)){
+    entries.push({user_id:S.userId,name:S.name,city:S.city,points:S.points,games_played:S.gamesPlayed.length,photos_shared:S.photosShared,isMe:true});
+    entries.sort((a,b)=>b.points-a.points);
+  }
+
+  const now=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lb-updated').textContent='Cập nhật lúc '+now+' · Supabase Live';
+
+  const colors=['#B8963E','#3D5C35','#6B4F32','#3D6B5E','#5C3D1E','#4A2D7A'];
+  const top3=entries.slice(0,3),rest=entries.slice(3);
+  const ord=[top3[1],top3[0],top3[2]].filter(Boolean);
+  const pc=['p2','p1','p3'],pr=['🥈','🥇','🥉'];
+
+  document.getElementById('podium').innerHTML=ord.length?ord.map((p,i)=>`
+    <div class="pi ${pc[i]}">
+      <div style="font-size:18px">${pr[i]}</div>
+      <div class="pav" style="background:${p.isMe?'var(--gd2)':colors[i]}">${p.isMe?'⭐':ini(p.name)}</div>
+      <div class="pnm">${p.name}</div>
+      <div class="psc">${(p.points||0).toLocaleString('vi-VN')}</div>
+    </div>`).join(''):'<div style="color:rgba(255,255,255,.6);font-size:13px;padding:10px;width:100%;text-align:center">Hãy là người đầu tiên lên bảng!</div>';
+
+  document.getElementById('lblist').innerHTML=rest.length?rest.map((p,i)=>`
+    <div class="lbrow${p.isMe?' me':''}">
+      <div class="lbr">${i+4}</div>
+      <div class="lbav" style="background:${p.isMe?'var(--sp)':'rgba(61,92,53,.09)'};color:${p.isMe?'var(--sage)':'var(--t2)'}">${p.isMe?'⭐':ini(p.name)}</div>
+      <div class="lbi">
+        <div class="lbn">${p.name}${p.isMe?'<span class="lbye">Bạn</span>':''}</div>
+        <div class="lbg">${p.games_played||0} trò chơi · ${p.city||''}</div>
+      </div>
+      <div class="lbsc">${(p.points||0).toLocaleString('vi-VN')}</div>
+    </div>`).join(''):'<div class="lb-msg">Mời bạn bè cùng tham gia để có bảng xếp hạng đầy đủ! 🏆</div>';
+}
+
+// ══════════════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════════════
+function renderProfile(){
+  document.getElementById('prav').textContent=S.initials||'?';
+  document.getElementById('prnm').textContent=S.name||'Player';
+  document.getElementById('prsi').textContent=(S.city||'VN')+' · '+S.joinedAt;
+  document.getElementById('sppts').textContent=S.points.toLocaleString('vi-VN');
+  document.getElementById('spgm').textContent=S.gamesPlayed.length;
+  document.getElementById('spph').textContent=S.photosShared;
+  let tier='🌱 Người Mới';
+  if(S.points>=4000)tier='🌺 Đại Sứ Văn Hoá';
+  else if(S.points>=2000)tier='🏮 Lữ Khách Văn Hoá';
+  else if(S.points>=800)tier='🎋 Người Khám Phá';
+  else if(S.points>=200)tier='🌿 Người Tìm Hiểu';
+  document.getElementById('prtier').textContent=tier;
+  fetchLeaderboard().then(entries=>{
+    const rk=entries.findIndex(e=>e.isMe)+1;
+    document.getElementById('sprk').textContent='#'+(rk>0?rk:'–');
+  });
+  const badges=[
+    ...Object.entries(GAMES).map(([id,g])=>({icon:g.icon,lbl:g.name,u:S.gamesPlayed.includes(id)})),
+    {icon:'📸',lbl:'5 Ảnh',u:S.photosShared>=5},
+    {icon:'🌟',lbl:'10 Ảnh',u:S.photosShared>=10},
+    {icon:'🏆',lbl:'Top 3',u:false},
+  ];
+  document.getElementById('bdgrow').innerHTML=badges.map(b=>`<div class="bc${b.u?'':' lk'}" title="${b.lbl}">${b.icon}</div>`).join('');
+  fetchLeaderboard().then(entries=>{
+    const rk=entries.findIndex(e=>e.isMe)+1;
+    if(rk>0&&rk<=3){const chips=document.querySelectorAll('.bc');chips[chips.length-1]?.classList.remove('lk');}
+  });
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(14px)'},3200);
+}
+function confetti(){
+  ['#B8963E','#3D5C35','#D4AE58','#8BA88B','#6B4F32','#EDD98A'].forEach(c=>{
+    for(let j=0;j<7;j++){
+      const el=document.createElement('div');el.className='cf';
+      el.style.cssText=`left:${8+Math.random()*84}vw;top:-8px;background:${c};width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.65}s;animation-duration:${1.2+Math.random()*.9}s`;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),2800);
+    }
+  });
+}
+function ini(name){if(!name)return'?';const p=name.trim().split(' ');return(p[0][0]+(p[p.length-1][0]||'')).toUpperCase();}
+</script>
+</body>
+</html>
